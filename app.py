@@ -1,6 +1,7 @@
 import socket
 import ssl
 import sys
+import argparse
 
 def test_connection(ip, port, cert_path):
     print(f"--- Testando {ip}:{port} ---")
@@ -36,12 +37,23 @@ def test_connection(ip, port, cert_path):
     print("-" * 30)
 
 # --- Configurações ---
-CERTIFICADO = ""
-ALVOS = [
-    {"ip": "", "port": 0},
-    {"ip": "", "port": 0}
-]
+def parse_args():
+    parser = argparse.ArgumentParser(description="Teste de Conexão SSL/TLS")
+
+    parser.add_argument("--cert", required=True, help="Caminho para o certificado .crt")
+    parser.add_argument("--targets", required=True, help="Lista de alvos no formato ip:port separados por vírgula (ex: 192.168.1.1:443,192.168.1.2:443)")
+
+    return parser.parse_args()
+
+def main():
+    args = parse_args()
+    
+    cert_path = args.cert
+    targets = args.targets.split(",")
+
+    for target in targets:
+        ip, port = target.split(":")
+        test_connection(ip.strip(), int(port.strip()), cert_path)
 
 if __name__ == "__main__":
-    for alvo in ALVOS:
-        test_connection(alvo["ip"], alvo["port"], CERTIFICADO)
+    main()
